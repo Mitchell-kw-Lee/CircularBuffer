@@ -25,7 +25,7 @@ public:
     typedef size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    friend class circular_buffer_iterator;
+    //friend class circular_buffer_iterator;
 
     T &operator[](size_type index)
     {
@@ -44,13 +44,11 @@ public:
     {
         this->m_head = this->m_tail;
         this->m_full = false;
-        this->m_empty = true;
     }
 
     bool empty() const
     {
-        //if head and tail are equal, we are empty
-        return this->m_empty;
+        return (!this->m_size);
     }
 
     bool full() const
@@ -160,7 +158,7 @@ public:
 private:
     value_type m_buf[_size];
 
-    bool m_full = false, m_empty = true;
+    bool m_full = false;
 
     size_type m_head = 0, m_tail = 0; // head = tail and we're empty
     size_type m_size = 0;

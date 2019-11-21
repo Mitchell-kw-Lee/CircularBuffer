@@ -6,19 +6,19 @@
 #define CIRCULARBUFFER_CIRCULAR_BUFFER_HPP
 
 #include <stdlib.h>
-#include <string.h>
+#include <memory.h>
+#include "circular_buffer_iterator.hpp"
 
 #ifndef SIZE_MAX
     #define SIZE_MAX ((const size_t)(~0))
 #endif
 
-template <typename... _T>
-class circular_buffer;
-
 template <typename T>
-class circular_buffer<T>
+class circular_buffer
 {
 public:
+    //friend class circular_buffer_iterator;
+
     typedef T value_type;
     typedef T* pointer;
     typedef const T* const_pointer;
@@ -26,8 +26,6 @@ public:
     typedef const T& const_reference;
     typedef size_t size_type;
     typedef std::ptrdiff_t difference_type;
-
-    friend class circular_buffer_iterator;
 
     T &operator[](size_type index)
     {
@@ -51,13 +49,12 @@ public:
     {
         this->m_head = this->m_tail;
         this->m_full = false;
-        this->m_empty = true;
     }
 
-    bool empty() const
+    bool clear() const
     {
         //if head and tail are equal, we are empty
-        return this->m_empty;
+        return (!this->m_size);
     }
 
     bool full() const
@@ -141,23 +138,24 @@ public:
 
     void push_back(const value_type &item)
     {
-        if (this->m_full)
-        {
-            this->increment_head();
+        if (!this->m_size) {
+            this->m_buf[this->m_head] = item;
+            this->m_tail = this->m_head;
+            ++this->m_size;
         }
-
-        if (this->m_empty)
+        else if (this->m_size != this->m_capacity)
         {
-            this->m_empty = false;
-            this->m_size++;
+            increment_tail();
+            this->m_buf[this->m_tail] = item;
         }
-        else
-        {
-            this->increment_tail();
+        else {
+            // We always accept data when full
+            // and lose the front()
+            increment_head();
+            increment_tail();
+            this->m_buf[this->m_tail] = item;
         }
-
-        this->m_buf[this->m_tail] = item;
-    }
+   }
 
     void pop_front()
     {
@@ -177,12 +175,34 @@ public:
         {
             size_type i = 0;
             size_type start = this->m_head + (this->m_capacity - n);
-            // Copy n elements
-            do
+
+            // Efficient but needs a lot of bookkeeping.
+            // Only do it for size > 10
+            if (this->m_size > 10)
             {
-                arr[i] = this->m_buf[(start + i) % this->m_logical_capacity];
-                ++i;
-            } while(i < n);
+                // Check if the array is fragmented
+                if ((this->m_tail - n) < 0) {
+                    const size_type seg1_begin = ((this->m_buf + this->m_capacity - 1) - n);
+                    const size_type seg1_end = this->m_capacity - 1;
+                    const size_type seg1_size = seg1_end - seg1_begin;
+
+                    memccpy(arr, seg1_begin, seg1_end);
+                    memccpy(arr + seg1_size, this->m_buf, this->m_tail);
+                }
+                else
+                {
+                    memccpy(arr, this->m_tail - n, this->m_tail);
+                }
+            }
+            else
+            {
+                do
+                {
+                    arr[i] = this->m_buf[(start + i) % this->m_logical_capacity];
+                    ++i;
+                } while(i < n);
+            }
+
             this->m_head = 0;
             this->m_tail = n - 1;
 
@@ -232,25 +252,10 @@ public:
         }
     }
 
-    /*
-    void resize(size_type n, const_reference val)
-    {
-        pointer arr = new value_type[n];
-        memcpy(arr, this->m_buf, this->m_capacity * sizeof(value_type));
-        delete[] this->m_buf;
-        do
-        {
-            this->m_buf[this->m_capacity] = val;
-            this->m_capacity++;
-        } while(this->m_capacity < this->m_buf);
-        this->m_buf = arr;
-    }
-    */
-
 private:
     value_type *m_buf;
 
-    bool m_full = false, m_empty = true;
+    bool m_full = false;
 
     size_type m_head = 0, m_tail = 0; // head = tail and we're empty
     size_type m_size = 0, m_logical_capacity, m_capacity;
