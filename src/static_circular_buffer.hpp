@@ -132,20 +132,9 @@ public:
 
     void push_back(const value_type &item)
     {
-        if (this->m_full)
-        {
-            this->increment_head();
-        }
-
-        if (this->m_empty)
-        {
-            this->m_empty = false;
-            this->m_size++;
-        }
-        else
-        {
-            this->increment_tail();
-        }
+        increment_tail();
+        if (this->m_size == this->m_logical_capacity)
+            increment_head();
 
         this->m_buf[this->m_tail] = item;
     }
@@ -160,7 +149,7 @@ private:
 
     bool m_full = false;
 
-    size_type m_head = 0, m_tail = 0; // head = tail and we're empty
+    size_type m_head = 1, m_tail = 0;
     size_type m_size = 0;
     const size_type m_capacity = _size;
 

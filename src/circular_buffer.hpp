@@ -17,8 +17,6 @@ template <typename T>
 class circular_buffer
 {
 public:
-    //friend class circular_buffer_iterator;
-
     typedef T value_type;
     typedef T* pointer;
     typedef const T* const_pointer;
@@ -51,7 +49,7 @@ public:
         this->m_full = false;
     }
 
-    bool clear() const
+    bool empty() const
     {
         //if head and tail are equal, we are empty
         return (!this->m_size);
@@ -138,23 +136,11 @@ public:
 
     void push_back(const value_type &item)
     {
-        if (!this->m_size) {
-            this->m_buf[this->m_head] = item;
-            this->m_tail = this->m_head;
-            ++this->m_size;
-        }
-        else if (this->m_size != this->m_capacity)
-        {
-            increment_tail();
-            this->m_buf[this->m_tail] = item;
-        }
-        else {
-            // We always accept data when full
-            // and lose the front()
+        increment_tail();
+        if (this->m_size == this->m_logical_capacity)
             increment_head();
-            increment_tail();
-            this->m_buf[this->m_tail] = item;
-        }
+
+        this->m_buf[this->m_tail] = item;
    }
 
     void pop_front()
@@ -257,7 +243,7 @@ private:
 
     bool m_full = false;
 
-    size_type m_head = 0, m_tail = 0; // head = tail and we're empty
+    size_type m_head = 1, m_tail = 0;
     size_type m_size = 0, m_logical_capacity, m_capacity;
 
     inline void increment_tail()
