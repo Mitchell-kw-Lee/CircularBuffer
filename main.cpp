@@ -14,12 +14,10 @@ int main()
     std::cout << circularBuffer.front() << std::endl;
     std::cout << circularBuffer.back() << std::endl;
 
-    circularBuffer.resize(4);
-    circularBuffer.push_back(4);
+    circularBuffer.resize(2);
 
     std::cout << circularBuffer.front() << std::endl;
     std::cout << circularBuffer.back() << std::endl;
-
 
     return 0;
 }
