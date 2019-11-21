@@ -1,7 +1,6 @@
 #include <iostream>
 #include "src/circular_buffer.hpp"
-#include "src/static_circular_buffer.hpp"
-
+#include <vector>
 int main()
 {
     circular_buffer<int> circularBuffer(3);
@@ -13,11 +12,16 @@ int main()
 
     std::cout << circularBuffer.front() << std::endl;
     std::cout << circularBuffer.back() << std::endl;
+    std::cout << "Full: " << (circularBuffer.full() ? "true" : "false") << std::endl;
 
-    circularBuffer.resize(2);
+    //circular_buffer
+    circular_buffer<int>::iterator it;
 
-    std::cout << circularBuffer.front() << std::endl;
-    std::cout << circularBuffer.back() << std::endl;
+    for (it = circularBuffer.begin(); it != circularBuffer.end(); it++)
+    {
+        std::cout << "Iterator: " << *it << std::endl;
+    }
+
 
     return 0;
 }

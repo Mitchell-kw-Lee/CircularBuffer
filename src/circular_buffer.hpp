@@ -27,6 +27,11 @@ public:
     typedef size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
+    typedef circular_buffer_iterator<circular_buffer<T>> iterator;
+    typedef const circular_buffer_iterator<circular_buffer<T>> const_iterator;
+
+    friend class circular_buffer_iterator<circular_buffer<T>>;
+
     T &operator[](size_type index)
     {
         return this->m_buf[index];
@@ -241,6 +246,48 @@ public:
         }
     }
 
+    iterator begin()
+    {
+        return iterator(this, 0);
+    }
+
+    iterator end()
+    {
+        return iterator(this, this->m_logical_capacity);
+    }
+
+    iterator rbegin()
+    {
+        return iterator(this, this->m_logical_capacity - 1);
+    }
+
+    iterator rend()
+    {
+        return iterator(this, -1);
+    }
+
+    /*
+    iterator cbegin()
+    {
+        return const_iterator(this, 0);
+    }
+
+    iterator cend()
+    {
+        return const_iterator(this, this->m_logical_capacity);
+    }
+
+    iterator crbegin()
+    {
+        return const_iterator(this, this->m_logical_capacity - 1);
+    }
+
+    iterator crend()
+    {
+        return const_iterator(this, -1);
+    }
+     */
+
 private:
     value_type *m_buf;
 
@@ -264,6 +311,8 @@ private:
 
         this->m_full = false;
     }
+
+
 };
 
 #endif //CIRCULARBUFFER_CIRCULAR_BUFFER_HPP
