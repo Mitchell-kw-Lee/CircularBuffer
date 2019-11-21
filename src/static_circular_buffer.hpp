@@ -132,9 +132,13 @@ public:
 
     void push_back(const value_type &item)
     {
-        increment_tail();
-        if (this->m_size == this->m_logical_capacity)
+        if (this->m_full)
             increment_head();
+
+        increment_tail();
+
+        std::cout << "tail: " << this->m_tail << std::endl;
+        std::cout << "size: " << this->m_size << std::endl;
 
         this->m_buf[this->m_tail] = item;
     }
