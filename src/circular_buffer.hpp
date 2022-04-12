@@ -48,6 +48,7 @@ public:
     void clear()
     {
         this->m_head = this->m_tail;
+        this->m_size = 0;
         this->m_full = false;
     }
 
@@ -64,19 +65,35 @@ public:
 
     reference front()
     {
+        if (empty()) {
+            //throw EXCEPTION_NONCONTINUABLE;
+            std::out_of_range("queue empty");
+        }
         return this->m_buf[this->m_head];
     }
     reference back()
     {
+        if (empty()) {
+            //throw EXCEPTION_NONCONTINUABLE;
+            std::out_of_range("queue empty");
+        }
         return this->m_buf[this->m_tail];
     }
 
     const_reference front() const
     {
+        if (empty()) {
+            //throw EXCEPTION_NONCONTINUABLE;
+            std::out_of_range("queue empty");
+        }
         return this->m_buf[this->m_head];
     }
     const_reference back() const
     {
+        if (empty()) {
+            //throw EXCEPTION_NONCONTINUABLE;
+            std::out_of_range("queue empty");
+        }
         return this->m_buf[this->m_tail];
     }
 
