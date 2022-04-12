@@ -48,6 +48,7 @@ public:
     void clear()
     {
         this->m_head = this->m_tail;
+        this->m_size = 0;
         this->m_full = false;
     }
 
